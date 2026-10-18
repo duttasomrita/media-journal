@@ -144,7 +144,7 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
                   </div>
                   <div className="mt-1 flex gap-1">
                     <Button size="sm" variant="secondary" className="h-7 flex-1 text-xs" onClick={() => add(it.id).then(() => toast.success(`Added to ${MONTHS[month - 1]}`))}>
-                      + {MONTHS[month - 1].slice(0, 3)}
+                      + {MONTHS[month - 1]?.slice(0, 3)}
                     </Button>
                     <Button
                       size="icon" variant="ghost" className="h-7 w-7" aria-label="Delete"
