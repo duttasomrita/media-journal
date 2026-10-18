@@ -43,37 +43,45 @@ async function searchWatch(q: string): Promise<SearchResult[]> {
         description: short(r.overview),
       }));
   }
-  // Keyless fallback: iTunes (movies) + TVmaze (shows)
-  const [movies, shows] = await Promise.allSettled([
-    getJson(`https://itunes.apple.com/search?media=movie&entity=movie&limit=5&term=${encodeURIComponent(q)}`),
+  // Keyless fallback: public title suggestions (movies & shows) + TVmaze (show details)
+  const [sugg, shows] = await Promise.allSettled([
+    getJson(`https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(q.trim().toLowerCase())}.json`),
     getJson(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`),
   ]);
   const out: SearchResult[] = [];
-  if (movies.status === "fulfilled") {
-    for (const r of movies.value.results ?? []) {
-      out.push({
-        external_id: `itunes:${r.trackId}`,
-        title: r.trackName,
-        creator: r.artistName ?? null,
-        cover_url: r.artworkUrl100 ? String(r.artworkUrl100).replace("100x100", "400x600") : null,
-        year: yr(r.releaseDate),
-        media_type: /documentary/i.test(r.primaryGenreName ?? "") ? "documentary" : "movie",
-        description: short(r.longDescription ?? r.shortDescription),
-      });
-    }
-  }
+  const seen = new Set<string>();
+  const typeMap: Record<string, string> = { movie: "movie", tvMovie: "movie", tvSeries: "tv", tvMiniSeries: "series", tvSpecial: "tv", short: "movie" };
   if (shows.status === "fulfilled") {
-    for (const { show: s } of (shows.value ?? []).slice(0, 5)) {
+    for (const { show: s } of (shows.value ?? []).slice(0, 4)) {
+      const y = yr(s.premiered);
+      seen.add(`${String(s.name).toLowerCase()}|${y}`);
       out.push({
         external_id: `tvmaze:${s.id}`,
         title: s.name,
         creator: s.network?.name ?? s.webChannel?.name ?? null,
         cover_url: s.image?.medium?.replace("http://", "https://") ?? null,
-        year: yr(s.premiered),
+        year: y,
         media_type: s.type === "Documentary" ? "documentary" : s.type === "Scripted" ? "series" : "tv",
         description: short(strip(s.summary)),
       });
     }
+  }
+  if (sugg.status === "fulfilled") {
+    const movies: SearchResult[] = [];
+    for (const r of sugg.value.d ?? []) {
+      if (!r.id?.startsWith("tt") || !typeMap[r.qid]) continue;
+      if (seen.has(`${String(r.l).toLowerCase()}|${r.y ?? null}`)) continue;
+      movies.push({
+        external_id: `imdb:${r.id}`,
+        title: r.l,
+        creator: r.s ?? null,
+        cover_url: r.i?.imageUrl ? String(r.i.imageUrl).replace("._V1_.jpg", "._V1_SX300.jpg") : null,
+        year: r.y ?? null,
+        media_type: typeMap[r.qid],
+        description: r.s ? `Starring ${r.s}` : null,
+      });
+    }
+    out.unshift(...movies);
   }
   return out;
 }
