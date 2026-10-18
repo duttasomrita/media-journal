@@ -77,7 +77,7 @@ async function searchWatch(q: string): Promise<SearchResult[]> {
         creator: r.s ?? null,
         cover_url: r.i?.imageUrl ? String(r.i.imageUrl).replace("._V1_.jpg", "._V1_SX300.jpg") : null,
         year: r.y ?? null,
-        media_type: typeMap[r.qid],
+        media_type: typeMap[r.qid] ?? "movie",
         description: r.s ? `Starring ${r.s}` : null,
       });
     }
