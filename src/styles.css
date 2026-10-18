@@ -73,6 +73,7 @@
 }
 
 .theme-watch {
+  --gradient-fade: linear-gradient(to top, var(--background) 5%, transparent 70%);
   --display-font: "Bebas Neue", "DM Sans", sans-serif;
   --background: oklch(0.13 0.005 20);
   --card: oklch(0.19 0.008 20);
@@ -85,6 +86,7 @@
 }
 
 .theme-read {
+  --gradient-fade: linear-gradient(to top, var(--background) 5%, transparent 70%);
   --display-font: "Cormorant Garamond", Georgia, serif;
   --background: oklch(0.95 0.025 85);
   --foreground: oklch(0.28 0.04 50);
