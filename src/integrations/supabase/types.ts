@@ -14,7 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      media_items: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          creator: string | null
+          description: string | null
+          external_id: string | null
+          id: string
+          media_type: string
+          title: string
+          track: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          creator?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          media_type?: string
+          title: string
+          track: string
+          user_id?: string
+          year?: number | null
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          creator?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          media_type?: string
+          title?: string
+          track?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      monthly_entries: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          media_id: string
+          month: number
+          rating: number | null
+          remarks: string | null
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          media_id: string
+          month: number
+          rating?: number | null
+          remarks?: string | null
+          updated_at?: string
+          user_id?: string
+          year: number
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          media_id?: string
+          month?: number
+          rating?: number | null
+          remarks?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_entries_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
