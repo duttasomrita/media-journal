@@ -41,7 +41,7 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
 
   const monthRows = useMemo(
     () => items.flatMap((it) => it.monthly_entries.filter((e) => e.year === year && e.month === month).map((e) => ({ entry: e, item: it })))
-      .sort((a, b) => a.entry.created_at?.localeCompare?.(b.entry.created_at) ?? 0),
+      .sort((a, b) => a.entry.created_at.localeCompare(b.entry.created_at)),
     [items, year, month],
   );
   const doneCount = monthRows.filter((r) => r.entry.completed).length;

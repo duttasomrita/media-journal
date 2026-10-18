@@ -24,6 +24,7 @@ export type Entry = {
   completed_at: string | null;
   rating: number | null;
   remarks: string | null;
+  created_at: string;
   updated_at: string;
 };
 
