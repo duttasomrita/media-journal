@@ -12,16 +12,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { searchMedia, type SearchResult } from "@/lib/search.functions";
 import { ensureItem, WATCH_TYPES, type MediaDraft, type MediaItem, type Track } from "@/lib/media";
 import { Cover } from "./Cover";
+import { PlatformField } from "./PlatformField";
 
 export function AddMediaDialog({
   track, onAdded, label = "Add title", themeClass,
-}: { track: Track; onAdded: (item: MediaItem) => Promise<void> | void; label?: string; themeClass: string }) {
+}: { track: Track; onAdded: (item: MediaItem, platform?: string) => Promise<void> | void; label?: string; themeClass: string }) {
   const [open, setOpen] = useState(false);
   const search = useServerFn(searchMedia);
   const [q, setQ] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pending, setPending] = useState<MediaDraft | null>(null);
+  const [platform, setPlatform] = useState("");
   const [manual, setManual] = useState({ title: "", creator: "", year: "", media_type: track === "watch" ? "movie" : "book", cover_url: "", description: "" });
 
   useEffect(() => {
@@ -38,13 +41,19 @@ export function AddMediaDialog({
     return () => { cancel = true; clearTimeout(t); };
   }, [q, track, search]);
 
+  async function choose(draft: MediaDraft) {
+    if (track === "watch") { setPending(draft); setPlatform(""); return; }
+    await save(draft);
+  }
+
   async function save(draft: MediaDraft) {
     setSaving(true);
     try {
       const item = await ensureItem(draft);
-      await onAdded(item);
+      await onAdded(item, draft.watch_platform ?? undefined);
       toast.success(`Added “${item.title}”`);
       setOpen(false); setQ(""); setResults([]);
+      setPending(null); setPlatform("");
       setManual((m) => ({ ...m, title: "", creator: "", year: "", cover_url: "", description: "" }));
     } catch (e: any) {
       toast.error(e.message ?? "Could not add");
@@ -52,7 +61,7 @@ export function AddMediaDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setPending(null); setPlatform(""); } }}>
       <DialogTrigger asChild>
         <Button size="sm"><Plus className="h-4 w-4" /> {label}</Button>
       </DialogTrigger>
@@ -60,7 +69,15 @@ export function AddMediaDialog({
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">{track === "watch" ? "Add a movie or show" : "Add a book"}</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="search">
+        {pending ? <div className="space-y-4">
+          <p className="font-semibold">{pending.title}</p>
+          <p className="text-xs text-muted-foreground">Cast: {pending.cast_names || "Unavailable"}</p>
+          <PlatformField value={platform} onChange={setPlatform} />
+          <div className="flex gap-2">
+            <Button variant="outline" disabled={saving} onClick={() => setPending(null)}>Back</Button>
+            <Button className="flex-1" disabled={saving || !platform.trim()} onClick={() => save({ ...pending, watch_platform: platform.trim() })}>{saving ? "Adding…" : "Add to list"}</Button>
+          </div>
+        </div> : <Tabs defaultValue="search">
           <TabsList className="w-full">
             <TabsTrigger value="search" className="flex-1">Search</TabsTrigger>
             <TabsTrigger value="manual" className="flex-1">Manual entry</TabsTrigger>
@@ -74,10 +91,10 @@ export function AddMediaDialog({
             <ul className="space-y-1">
               {results.map((r) => (
                 <li key={r.external_id}>
-                  <button
+                  <Button variant="ghost"
                     disabled={saving}
-                    onClick={() => save({ ...r, track })}
-                    className="flex w-full gap-3 rounded-lg p-2 text-left transition hover:bg-secondary"
+                    onClick={() => choose({ ...r, track, cast_names: r.cast_names ?? null, watch_platform: null })}
+                    className="flex h-auto w-full items-start justify-start gap-3 whitespace-normal rounded-lg p-2 text-left transition hover:bg-secondary"
                   >
                     <Cover src={r.cover_url} title={r.title} track={track} className="w-12 shrink-0" />
                     <div className="min-w-0">
@@ -87,7 +104,7 @@ export function AddMediaDialog({
                       </p>
                       {r.description && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{r.description}</p>}
                     </div>
-                  </button>
+                  </Button>
                 </li>
               ))}
               {!loading && q.trim().length >= 2 && results.length === 0 && (
@@ -102,9 +119,10 @@ export function AddMediaDialog({
                 e.preventDefault();
                 if (!manual.title.trim()) return;
                 const y = parseInt(manual.year, 10);
-                save({
+                choose({
                   track, external_id: null, title: manual.title,
-                  creator: manual.creator || null, cover_url: manual.cover_url || null,
+                  creator: track === "read" ? manual.creator || null : null, cover_url: manual.cover_url || null,
+                  cast_names: track === "watch" ? manual.creator || null : null, watch_platform: null,
                   year: Number.isFinite(y) ? y : null, media_type: manual.media_type,
                   description: manual.description || null,
                 });
@@ -112,7 +130,7 @@ export function AddMediaDialog({
             >
               <div className="space-y-1.5"><Label>Title</Label><Input required value={manual.title} onChange={(e) => setManual({ ...manual, title: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5"><Label>{track === "watch" ? "Studio / network" : "Author"}</Label><Input value={manual.creator} onChange={(e) => setManual({ ...manual, creator: e.target.value })} /></div>
+                <div className="space-y-1.5"><Label>{track === "watch" ? "Cast (optional)" : "Author"}</Label><Input value={manual.creator} onChange={(e) => setManual({ ...manual, creator: e.target.value })} /></div>
                 <div className="space-y-1.5"><Label>Year</Label><Input inputMode="numeric" value={manual.year} onChange={(e) => setManual({ ...manual, year: e.target.value })} /></div>
               </div>
               {track === "watch" && (
@@ -129,7 +147,7 @@ export function AddMediaDialog({
               <Button type="submit" className="w-full" disabled={saving}>Save</Button>
             </form>
           </TabsContent>
-        </Tabs>
+        </Tabs>}
       </DialogContent>
     </Dialog>
   );

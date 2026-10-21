@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       media_items: {
         Row: {
+          cast_names: string | null
           cover_url: string | null
           created_at: string
           creator: string | null
@@ -26,9 +27,11 @@ export type Database = {
           title: string
           track: string
           user_id: string
+          watch_platform: string | null
           year: number | null
         }
         Insert: {
+          cast_names?: string | null
           cover_url?: string | null
           created_at?: string
           creator?: string | null
@@ -39,9 +42,11 @@ export type Database = {
           title: string
           track: string
           user_id?: string
+          watch_platform?: string | null
           year?: number | null
         }
         Update: {
+          cast_names?: string | null
           cover_url?: string | null
           created_at?: string
           creator?: string | null
@@ -52,6 +57,7 @@ export type Database = {
           title?: string
           track?: string
           user_id?: string
+          watch_platform?: string | null
           year?: number | null
         }
         Relationships: []
@@ -68,6 +74,7 @@ export type Database = {
           remarks: string | null
           updated_at: string
           user_id: string
+          watch_platform: string | null
           year: number
         }
         Insert: {
@@ -81,6 +88,7 @@ export type Database = {
           remarks?: string | null
           updated_at?: string
           user_id?: string
+          watch_platform?: string | null
           year: number
         }
         Update: {
@@ -94,6 +102,7 @@ export type Database = {
           remarks?: string | null
           updated_at?: string
           user_id?: string
+          watch_platform?: string | null
           year?: number
         }
         Relationships: [

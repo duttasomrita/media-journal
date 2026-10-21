@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { requireWatchPlatform } from "./watch-details";
 
 export type Track = "watch" | "read";
 
@@ -8,6 +9,8 @@ export type MediaItem = {
   external_id: string | null;
   title: string;
   creator: string | null;
+  cast_names: string | null;
+  watch_platform: string | null;
   cover_url: string | null;
   year: number | null;
   media_type: string;
@@ -24,6 +27,7 @@ export type Entry = {
   completed_at: string | null;
   rating: number | null;
   remarks: string | null;
+  watch_platform: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -83,6 +87,7 @@ export async function fetchCompleted(): Promise<EntryWithItem[]> {
 
 /** Find an existing master record for this media, or create one. Never duplicates. */
 export async function ensureItem(draft: MediaDraft): Promise<MediaItem> {
+  if (draft.track === "watch") draft = { ...draft, watch_platform: requireWatchPlatform(draft.watch_platform) };
   let q = supabase.from("media_items").select("*").eq("track", draft.track);
   if (draft.external_id) q = q.eq("external_id", draft.external_id);
   else {
@@ -100,14 +105,17 @@ export async function ensureItem(draft: MediaDraft): Promise<MediaItem> {
   return data as MediaItem;
 }
 
-export async function addToMonth(mediaId: string, year: number, month: number) {
+export async function addToMonth(mediaId: string, year: number, month: number, watchPlatform?: string | null) {
+  const { data: item, error: itemError } = await supabase.from("media_items").select("track").eq("id", mediaId).single();
+  if (itemError) throw itemError;
+  const platform = item.track === "watch" ? requireWatchPlatform(watchPlatform) : null;
   const { error } = await supabase
     .from("monthly_entries")
-    .upsert({ media_id: mediaId, year, month }, { onConflict: "media_id,year,month", ignoreDuplicates: true });
+    .upsert({ media_id: mediaId, year, month, watch_platform: platform }, { onConflict: "media_id,year,month", ignoreDuplicates: true });
   if (error) throw error;
 }
 
-export async function updateEntry(id: string, patch: Partial<Pick<Entry, "completed" | "completed_at" | "rating" | "remarks">>) {
+export async function updateEntry(id: string, patch: Partial<Pick<Entry, "completed" | "completed_at" | "rating" | "remarks" | "watch_platform">>) {
   const { error } = await supabase
     .from("monthly_entries")
     .update({ ...patch, updated_at: new Date().toISOString() })

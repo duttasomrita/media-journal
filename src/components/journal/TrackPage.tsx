@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PlatformField } from "./PlatformField";
 import {
   addToMonth, fetchItems, masterStatus, MONTHS, removeEntry, removeItem, updateEntry, WATCH_TYPES,
   type ItemWithEntries, type Track,
@@ -24,6 +26,9 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [filter, setFilter] = useState("");
+  const [pendingItem, setPendingItem] = useState<ItemWithEntries | null>(null);
+  const [platform, setPlatform] = useState("");
+  const [adding, setAdding] = useState(false);
   const themeClass = track === "watch" ? "theme-watch" : "theme-read";
   const invalidate = () => { qc.invalidateQueries({ queryKey: ["items", track] }); qc.invalidateQueries({ queryKey: ["completed"] }); };
 
@@ -47,8 +52,17 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
   const doneCount = monthRows.filter((r) => r.entry.completed).length;
   const notInMonth = items.filter((it) => !it.monthly_entries.some((e) => e.year === year && e.month === month));
 
-  async function add(id: string) {
-    try { await addToMonth(id, year, month); invalidate(); } catch (e: any) { toast.error(e.message); }
+  async function add(id: string, selectedPlatform?: string) {
+    await addToMonth(id, year, month, selectedPlatform); invalidate();
+  }
+
+  function requestAdd(id: string) {
+    if (track === "watch") {
+      const item = items.find((it) => it.id === id);
+      if (item) { setPendingItem(item); setPlatform(""); }
+      return;
+    }
+    add(id).then(() => toast.success(`Added to ${MONTHS[month - 1]}`)).catch((e) => toast.error(e.message));
   }
 
   const years = Array.from({ length: 8 }, (_, i) => now.getFullYear() + 1 - i);
@@ -56,6 +70,20 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
 
   return (
     <div className="space-y-6">
+      <Dialog open={!!pendingItem} onOpenChange={(v) => { if (!v && !adding) setPendingItem(null); }}>
+        <DialogContent className={themeClass}>
+          <DialogHeader><DialogTitle>Where did you watch it?</DialogTitle></DialogHeader>
+          <p className="font-semibold">{pendingItem?.title}</p>
+          <PlatformField value={platform} onChange={setPlatform} />
+          <Button disabled={adding || !platform.trim()} onClick={async () => {
+            if (!pendingItem) return;
+            setAdding(true);
+            try { await add(pendingItem.id, platform.trim()); setPendingItem(null); toast.success(`Added to ${MONTHS[month - 1]}`); }
+            catch (e: any) { toast.error(e.message); }
+            finally { setAdding(false); }
+          }}>{adding ? "Adding…" : "Add to list"}</Button>
+        </DialogContent>
+      </Dialog>
       <section className="relative overflow-hidden border-y">
         <img src={hero} alt={track === "watch" ? "Handmade popcorn and movie collage" : "Handmade books and bookmarks collage"} width={1600} height={800} className="h-52 w-full object-cover sm:h-64" />
         <div className="absolute inset-0 bg-fade" />
@@ -84,14 +112,14 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
             </Select>
             <div className="ml-auto flex flex-wrap gap-2">
               {notInMonth.length > 0 && (
-                <Select value="" onValueChange={add}>
+                <Select value="" onValueChange={requestAdd}>
                   <SelectTrigger className="h-9 w-44"><CalendarPlus className="h-4 w-4" /><SelectValue placeholder="From master list" /></SelectTrigger>
                   <SelectContent className={themeClass}>
                     {notInMonth.map((it) => <SelectItem key={it.id} value={it.id}>{it.title}{it.year ? ` (${it.year})` : ""}</SelectItem>)}
                   </SelectContent>
                 </Select>
               )}
-              <AddMediaDialog track={track} themeClass={themeClass} label="Add new" onAdded={(it) => add(it.id)} />
+              <AddMediaDialog track={track} themeClass={themeClass} label="Add new" onAdded={(it, selectedPlatform) => add(it.id, selectedPlatform)} />
             </div>
           </div>
 
@@ -141,10 +169,14 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
                     <p className="text-xs text-muted-foreground">
                       {[it.year, track === "watch" ? WATCH_TYPES.find((t) => t.value === it.media_type)?.label : it.creator].filter(Boolean).join(" · ")}
                     </p>
+                    {track === "watch" && <>
+                      <p className="text-xs text-muted-foreground">Cast: {it.cast_names || "Unavailable"}</p>
+                      <p className="text-xs text-muted-foreground">Watched on: {Array.from(new Set(it.monthly_entries.map((e) => e.watch_platform).filter(Boolean))).join(", ") || it.watch_platform || "Not selected"}</p>
+                    </>}
                     {s.lastCompleted && <p className="text-xs text-primary">Finished {s.lastCompleted}</p>}
                   </div>
                   <div className="mt-1 flex gap-1">
-                    <Button size="sm" variant="secondary" className="h-7 flex-1 text-xs" onClick={() => add(it.id).then(() => toast.success(`Added to ${MONTHS[month - 1]}`))}>
+                    <Button size="sm" variant="secondary" className="h-7 flex-1 text-xs" onClick={() => requestAdd(it.id)}>
                       + {MONTHS[month - 1]?.slice(0, 3)}
                     </Button>
                     <Button
