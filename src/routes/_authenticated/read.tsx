@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TrackPage, itemsQuery } from "@/components/journal/TrackPage";
-import hero from "@/assets/read-hero.jpg";
+import hero from "@/assets/read-collage.jpg";
 
 export const Route = createFileRoute("/_authenticated/read")({
   head: () => ({

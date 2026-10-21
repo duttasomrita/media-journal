@@ -39,73 +39,56 @@
   --color-sage: var(--sage);
 }
 
-/* Home / neutral: cinematic charcoal with warm undertone */
+/* Bright paper, ink, and cut-paper accents */
 :root {
-  --radius: 0.75rem;
-  --display-font: "Bebas Neue", "DM Sans", sans-serif;
-  --background: oklch(0.16 0.01 30);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.21 0.012 30);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.21 0.012 30);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.58 0.22 27);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.27 0.012 30);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.25 0.01 30);
-  --muted-foreground: oklch(0.7 0.015 60);
-  --accent: oklch(0.3 0.03 27);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.7 0.15 150);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.58 0.22 27);
-  --cinema: oklch(0.13 0.005 20);
-  --cinema-foreground: oklch(0.97 0 0);
-  --library: oklch(0.93 0.03 80);
-  --library-foreground: oklch(0.3 0.04 50);
-  --sage: oklch(0.55 0.06 140);
-  --shadow-card: 0 20px 40px -20px oklch(0 0 0 / 0.6);
-  --gradient-fade: linear-gradient(to top, var(--background) 5%, transparent 70%);
+  --radius: 0.5rem;
+  --display-font: "Bricolage Grotesque", "DM Sans", sans-serif;
+  --background: oklch(0.985 0.003 95);
+  --foreground: oklch(0.25 0.015 30);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.54 0.2 26);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.93 0.09 94);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.95 0.005 95);
+  --muted-foreground: oklch(0.47 0.015 30);
+  --accent: oklch(0.91 0.045 210);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.53 0.2 25);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.47 0.1 160);
+  --border: oklch(0.25 0.015 30 / 22%);
+  --input: oklch(0.25 0.015 30 / 30%);
+  --ring: var(--primary);
+  --cinema: oklch(0.91 0.045 225);
+  --cinema-foreground: var(--foreground);
+  --library: oklch(0.93 0.045 10);
+  --library-foreground: var(--foreground);
+  --sage: oklch(0.5 0.09 160);
+  --tape: oklch(0.9 0.11 95 / 85%);
+  --paper-line: oklch(0.25 0.015 30 / 5%);
+  --shadow-card: 4px 5px 0 oklch(0.25 0.015 30 / 16%);
+  --gradient-fade: linear-gradient(to right, var(--cinema) 0%, transparent 70%);
 }
 
 .theme-watch {
-  --gradient-fade: linear-gradient(to top, var(--background) 5%, transparent 70%);
-  --display-font: "Bebas Neue", "DM Sans", sans-serif;
-  --background: oklch(0.13 0.005 20);
-  --card: oklch(0.19 0.008 20);
-  --popover: oklch(0.19 0.008 20);
-  --secondary: oklch(0.24 0.008 20);
-  --muted: oklch(0.22 0.008 20);
-  --primary: oklch(0.58 0.23 27);
-  --accent: oklch(0.32 0.08 27);
-  --shadow-card: 0 18px 40px -18px oklch(0.58 0.23 27 / 0.45);
+  --background: oklch(0.98 0.009 225);
+  --secondary: oklch(0.93 0.09 94);
+  --muted: oklch(0.94 0.02 225);
+  --accent: oklch(0.91 0.045 225);
 }
 
 .theme-read {
-  --gradient-fade: linear-gradient(to top, var(--background) 5%, transparent 70%);
-  --display-font: "Cormorant Garamond", Georgia, serif;
-  --background: oklch(0.95 0.025 85);
-  --foreground: oklch(0.28 0.04 50);
-  --card: oklch(0.98 0.015 85);
-  --card-foreground: oklch(0.28 0.04 50);
-  --popover: oklch(0.98 0.015 85);
-  --popover-foreground: oklch(0.28 0.04 50);
-  --primary: oklch(0.48 0.07 145);
-  --primary-foreground: oklch(0.98 0.01 85);
-  --secondary: oklch(0.9 0.035 75);
-  --secondary-foreground: oklch(0.3 0.04 50);
-  --muted: oklch(0.91 0.03 80);
-  --muted-foreground: oklch(0.48 0.04 55);
-  --accent: oklch(0.86 0.05 70);
-  --accent-foreground: oklch(0.28 0.04 50);
-  --border: oklch(0.45 0.05 55 / 20%);
-  --input: oklch(0.45 0.05 55 / 28%);
-  --ring: oklch(0.48 0.07 145);
-  --shadow-card: 0 14px 30px -16px oklch(0.35 0.05 50 / 0.45);
+  --background: oklch(0.98 0.01 10);
+  --primary: oklch(0.43 0.1 165);
+  --secondary: oklch(0.91 0.045 165);
+  --muted: oklch(0.94 0.02 10);
+  --accent: oklch(0.91 0.045 165);
+  --ring: var(--primary);
+  --gradient-fade: linear-gradient(to right, var(--library) 0%, transparent 70%);
 }
 
 @layer base {
@@ -117,7 +100,15 @@
   }
 }
 
-@utility font-display { font-family: var(--display-font); letter-spacing: 0.02em; }
+@utility font-display { font-family: var(--display-font); letter-spacing: 0; font-weight: 700; }
+@utility font-hand { font-family: "Caveat", cursive; }
+@utility paper-surface {
+  background-image: repeating-linear-gradient(0deg, transparent 0 31px, var(--paper-line) 31px 32px);
+}
+@utility taped {
+  position: relative;
+  &::before { content: ""; position: absolute; z-index: 2; width: 76px; height: 22px; top: -10px; left: 22px; background: var(--tape); transform: rotate(-5deg); }
+}
 @utility shadow-card { box-shadow: var(--shadow-card); }
 @utility bg-fade { background-image: var(--gradient-fade); }
 @utility poster-hover {
@@ -130,3 +121,7 @@
 }
 @utility fade-up { animation: fade-up 0.5s ease both; }
 @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

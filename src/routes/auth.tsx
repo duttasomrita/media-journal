@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import watchHero from "@/assets/watch-hero.jpg";
+import watchHero from "@/assets/watch-collage.jpg";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -64,9 +64,8 @@ function AuthPage() {
 
   return (
     <div className="theme-watch relative flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
-      <img src={watchHero} alt="" width={1600} height={704} className="absolute inset-0 h-full w-full object-cover opacity-40" />
-      <div className="absolute inset-0 bg-fade" />
-      <div className="fade-up relative w-full max-w-sm rounded-2xl border bg-card/90 p-6 shadow-card backdrop-blur">
+      <img src={watchHero} alt="" width={1600} height={800} className="absolute inset-0 h-full w-full object-cover" />
+      <div className="fade-up taped paper-surface relative w-full max-w-sm rounded-lg border bg-card p-6 shadow-card">
         <h1 className="font-display text-4xl">My Media <span className="text-primary">Journal</span></h1>
         <p className="mt-1 text-sm text-muted-foreground">Your private log of everything you watch and read.</p>
         {sent ? (
@@ -87,9 +86,9 @@ function AuthPage() {
               </Button>
             </form>
             <Button variant="secondary" className="mt-3 w-full" onClick={google}>Continue with Google</Button>
-            <button className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "in" ? "up" : "in")}>
+            <Button variant="link" className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "in" ? "up" : "in")}>
               {mode === "in" ? "New here? Create an account" : "Already have an account? Sign in"}
-            </button>
+            </Button>
           </>
         )}
       </div>

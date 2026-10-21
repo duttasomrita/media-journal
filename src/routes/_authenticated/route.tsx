@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/
 import { Film, BookOpen, Home, Star, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -42,13 +43,13 @@ function AppLayout() {
               </Link>
             ))}
           </nav>
-          <button
+            <Button variant="ghost" size="sm"
             onClick={() => supabase.auth.signOut()}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
             aria-label="Sign out"
           >
             <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Sign out</span>
-          </button>
+            </Button>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">

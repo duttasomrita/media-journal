@@ -56,11 +56,12 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-2xl border">
-        <img src={hero} alt="" width={1600} height={704} className="h-36 w-full object-cover sm:h-48" />
+      <section className="relative overflow-hidden border-y">
+        <img src={hero} alt={track === "watch" ? "Handmade popcorn and movie collage" : "Handmade books and bookmarks collage"} width={1600} height={800} className="h-52 w-full object-cover sm:h-64" />
         <div className="absolute inset-0 bg-fade" />
-        <div className="absolute bottom-3 left-4">
-          <h1 className="font-display text-5xl font-semibold text-foreground sm:text-6xl">{track === "watch" ? "Watch Track" : "Read Track"}</h1>
+        <div className="absolute inset-y-0 left-5 flex max-w-[55%] flex-col justify-center sm:left-8">
+          <p className="font-hand mb-2 text-2xl text-primary">{track === "watch" ? "Pass the popcorn!" : "Just one more chapter…"}</p>
+          <h1 className="font-display text-4xl text-foreground sm:text-6xl">{track === "watch" ? "Watch Track" : "Read Track"}</h1>
         </div>
       </section>
       {track === "watch" && <div className="film-strip" />}
@@ -113,7 +114,7 @@ export function TrackPage({ track, hero }: { track: Track; hero: string }) {
             ))}
           </ul>
           {monthRows.length === 0 && (
-            <div className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">
+            <div className="paper-surface border-y border-dashed p-10 text-center text-muted-foreground">
               Nothing planned for {MONTHS[month - 1]} yet. Add something from your master list or search for a new title.
             </div>
           )}

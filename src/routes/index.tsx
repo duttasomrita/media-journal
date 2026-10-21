@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Film, BookOpen } from "lucide-react";
+import { Film, BookOpen, ArrowUpRight, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import watchHero from "@/assets/watch-hero.jpg";
-import readHero from "@/assets/read-hero.jpg";
+import { Button } from "@/components/ui/button";
+import watchHero from "@/assets/watch-collage.jpg";
+import readHero from "@/assets/read-collage.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,33 +27,40 @@ function Landing() {
   }, [nav]);
 
   return (
-    <div className="grid min-h-screen md:grid-cols-2">
-      <section className="theme-watch relative flex min-h-[50vh] items-end overflow-hidden bg-background p-8 text-foreground">
-        <img src={watchHero} alt="Film reel and popcorn" width={1600} height={704} className="absolute inset-0 h-full w-full object-cover opacity-70" />
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="paper-surface border-b px-5 py-5 sm:px-10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl sm:text-4xl">My Media <span className="text-primary">Journal<span className="font-hand">!</span></span></h1>
+          <span className="font-hand flex items-center gap-2 text-xl text-muted-foreground"><Sparkles className="h-4 w-4 text-primary" /> For the love of stories</span>
+        </div>
+      </header>
+      <section className="theme-watch relative overflow-hidden border-b bg-cinema text-foreground">
+        <img src={watchHero} alt="Paper-craft popcorn, film and movie tickets" width={1600} height={800} className="absolute inset-0 h-full w-full object-cover object-right" />
         <div className="absolute inset-0 bg-fade" />
-        <div className="relative fade-up">
-          <Film className="h-8 w-8 text-primary" />
-          <h2 className="font-display text-6xl">Watch Track</h2>
-          <p className="text-muted-foreground">Movies, shows, series & documentaries.</p>
+        <div className="relative mx-auto flex min-h-[400px] max-w-6xl flex-col justify-center px-5 py-10 sm:min-h-[470px] sm:px-10">
+          <div className="fade-up max-w-[62%] sm:max-w-md">
+            <p className="font-hand mb-3 text-2xl text-primary sm:text-3xl">Pass the popcorn!</p>
+            <Film className="mb-3 h-7 w-7" />
+            <h2 className="font-display text-4xl leading-tight sm:text-6xl">Watch Track</h2>
+            <p className="mt-3 max-w-xs text-sm sm:text-base">Movies, shows & all those “just one more episode” nights.</p>
+            <Button asChild className="mt-6 h-11 px-4"><Link to="/auth">Open my journal <ArrowUpRight /></Link></Button>
+          </div>
         </div>
       </section>
-      <section className="theme-read relative flex min-h-[50vh] items-end overflow-hidden bg-background p-8 text-foreground">
-        <img src={readHero} alt="Cozy bookshelf" width={1600} height={704} className="absolute inset-0 h-full w-full object-cover opacity-60" />
+      <section className="theme-read relative overflow-hidden border-b bg-library text-foreground">
+        <img src={readHero} alt="Paper-craft books, bookmarks and a daisy" loading="lazy" width={1600} height={800} className="absolute inset-0 h-full w-full object-cover object-right" />
         <div className="absolute inset-0 bg-fade" />
-        <div className="relative fade-up">
-          <BookOpen className="h-8 w-8 text-primary" />
-          <h2 className="font-display text-6xl font-semibold">Read Track</h2>
-          <p className="text-muted-foreground">Every book, every month, every thought.</p>
+        <div className="relative mx-auto flex min-h-[360px] max-w-6xl flex-col justify-center px-5 py-10 sm:min-h-[420px] sm:px-10">
+          <div className="max-w-[62%] sm:max-w-md">
+            <p className="font-hand mb-3 text-2xl text-primary sm:text-3xl">Just one more chapter…</p>
+            <BookOpen className="mb-3 h-7 w-7" />
+            <h2 className="font-display text-4xl leading-tight sm:text-6xl">Read Track</h2>
+            <p className="mt-3 max-w-xs text-sm sm:text-base">Every book, every month, every thought.</p>
+            <Button asChild variant="outline" className="mt-6 h-11"><Link to="/auth">My reading journal <ArrowUpRight /></Link></Button>
+          </div>
         </div>
       </section>
-      <div className="pointer-events-none fixed inset-x-0 top-0 flex justify-center p-6">
-        <div className="pointer-events-auto flex flex-col items-center gap-3 rounded-2xl border bg-card/90 px-6 py-4 shadow-card backdrop-blur">
-          <h1 className="font-display text-4xl text-foreground">My Media <span className="text-primary">Journal</span></h1>
-          <Link to="/auth" className="rounded-md bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground">
-            Open my journal
-          </Link>
-        </div>
-      </div>
+      <footer className="paper-surface px-5 py-6 text-center font-hand text-2xl text-muted-foreground">The stories end. The memories stay.</footer>
     </div>
   );
 }
