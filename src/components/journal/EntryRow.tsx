@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { todayISO, type Entry, type MediaItem } from "@/lib/media";
 import { Cover } from "./Cover";
+import { PlatformField } from "./PlatformField";
 
-export type EntryPatch = Partial<Pick<Entry, "completed" | "completed_at" | "rating" | "remarks">>;
+export type EntryPatch = Partial<Pick<Entry, "completed" | "completed_at" | "rating" | "remarks" | "watch_platform">>;
 
 export function RatingSelect({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   return (
@@ -42,12 +43,14 @@ export function EntryRow({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className={cn("font-semibold leading-tight", entry.completed && "text-muted-foreground line-through decoration-primary/60")}>{item.title}</p>
-            <p className="text-xs text-muted-foreground">{[item.year, item.creator].filter(Boolean).join(" · ")}</p>
+            <p className="text-xs text-muted-foreground">{[item.year, item.track === "read" ? item.creator : null].filter(Boolean).join(" · ")}</p>
+            {item.track === "watch" && <p className="text-xs text-muted-foreground">Cast: {item.cast_names || "Unavailable"}</p>}
           </div>
           <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={onRemove} aria-label="Remove from this month">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
+        {item.track === "watch" && <PlatformField value={entry.watch_platform ?? ""} onChange={(watch_platform) => { if (watch_platform.trim()) onUpdate({ watch_platform }); }} />}
         {entry.completed && (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
