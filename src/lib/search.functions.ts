@@ -5,6 +5,7 @@ export type SearchResult = {
   external_id: string;
   title: string;
   creator: string | null;
+  cast_names?: string | null;
   cover_url: string | null;
   year: number | null;
   media_type: string;
@@ -19,9 +20,31 @@ const strip = (s?: string | null) => (s ? s.replace(/<[^>]+>/g, "").trim() : nul
 const short = (s?: string | null) => (s && s.length > 600 ? s.slice(0, 597) + "…" : s ?? null);
 
 async function getJson(url: string, init?: RequestInit) {
-  const r = await fetch(url, init);
+  const r = await fetch(url, { ...init, signal: AbortSignal.timeout(8000) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
+}
+
+async function watchCast(externalId: string, title: string): Promise<string | null> {
+  try {
+    if (externalId.startsWith("tvmaze:")) {
+      const cast = await getJson(`https://api.tvmaze.com/shows/${externalId.split(":")[1]}/cast`);
+      return cast.slice(0, 5).map((c: any) => c.person?.name).filter(Boolean).join(", ") || null;
+    }
+    if (externalId.startsWith("tmdb:")) {
+      const key = process.env["TMDB_API_KEY"];
+      if (!key) return null;
+      const [, type, id] = externalId.split(":");
+      const token = key.length > 40;
+      const credits = await getJson(`https://api.themoviedb.org/3/${type}/${id}/credits${token ? "" : `?api_key=${key}`}`, token ? { headers: { Authorization: `Bearer ${key}` } } : undefined);
+      return credits.cast?.slice(0, 5).map((c: any) => c.name).filter(Boolean).join(", ") || null;
+    }
+    if (externalId.startsWith("imdb:")) {
+      const j = await getJson(`https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(title.toLowerCase())}.json`);
+      return j.d?.find((r: any) => `imdb:${r.id}` === externalId)?.s ?? null;
+    }
+  } catch { /* Metadata absence must not block list access. */ }
+  return null;
 }
 
 async function searchWatch(q: string): Promise<SearchResult[]> {
@@ -30,18 +53,19 @@ async function searchWatch(q: string): Promise<SearchResult[]> {
     const isToken = key.length > 40;
     const url = `https://api.themoviedb.org/3/search/multi?include_adult=false&query=${encodeURIComponent(q)}${isToken ? "" : `&api_key=${key}`}`;
     const j = await getJson(url, isToken ? { headers: { Authorization: `Bearer ${key}` } } : undefined);
-    return (j.results ?? [])
+    return Promise.all((j.results ?? [])
       .filter((r: any) => r.media_type === "movie" || r.media_type === "tv")
       .slice(0, 8)
-      .map((r: any) => ({
+      .map(async (r: any) => ({
         external_id: `tmdb:${r.media_type}:${r.id}`,
         title: r.title ?? r.name,
         creator: null,
+        cast_names: await watchCast(`tmdb:${r.media_type}:${r.id}`, r.title ?? r.name),
         cover_url: r.poster_path ? `https://image.tmdb.org/t/p/w342${r.poster_path}` : null,
         year: yr(r.release_date ?? r.first_air_date),
         media_type: r.genre_ids?.includes(99) ? "documentary" : r.media_type === "tv" ? "tv" : "movie",
         description: short(r.overview),
-      }));
+      })));
   }
   // Keyless fallback: public title suggestions (movies & shows) + TVmaze (show details)
   const [sugg, shows] = await Promise.allSettled([
@@ -58,7 +82,8 @@ async function searchWatch(q: string): Promise<SearchResult[]> {
       out.push({
         external_id: `tvmaze:${s.id}`,
         title: s.name,
-        creator: s.network?.name ?? s.webChannel?.name ?? null,
+        creator: null,
+        cast_names: await watchCast(`tvmaze:${s.id}`, s.name),
         cover_url: s.image?.medium?.replace("http://", "https://") ?? null,
         year: y,
         media_type: s.type === "Documentary" ? "documentary" : s.type === "Scripted" ? "series" : "tv",
@@ -74,7 +99,8 @@ async function searchWatch(q: string): Promise<SearchResult[]> {
       movies.push({
         external_id: `imdb:${r.id}`,
         title: r.l,
-        creator: r.s ?? null,
+        creator: null,
+        cast_names: r.s ?? null,
         cover_url: r.i?.imageUrl ? String(r.i.imageUrl).replace("._V1_.jpg", "._V1_SX300.jpg") : null,
         year: r.y ?? null,
         media_type: typeMap[r.qid] ?? "movie",
@@ -134,4 +160,20 @@ export const searchMedia = createServerFn({ method: "POST" })
       console.error("search failed", e);
       return [] as SearchResult[];
     }
+  });
+
+export const refreshWatchCast = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.from("media_items").select("id, external_id, title").eq("track", "watch").is("cast_names", null).limit(30);
+    if (error) throw error;
+    let updated = 0;
+    await Promise.all((data ?? []).map(async (item) => {
+      if (!item.external_id) return;
+      const cast_names = await watchCast(item.external_id, item.title);
+      if (!cast_names) return;
+      const { error: updateError } = await context.supabase.from("media_items").update({ cast_names }).eq("id", item.id);
+      if (!updateError) updated++;
+    }));
+    return { updated };
   });
