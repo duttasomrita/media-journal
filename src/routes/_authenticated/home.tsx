@@ -5,8 +5,8 @@ import { itemsQuery } from "@/components/journal/TrackPage";
 import { Cover } from "@/components/journal/Cover";
 import { Progress } from "@/components/ui/progress";
 import { masterStatus, MONTHS, type ItemWithEntries } from "@/lib/media";
-import watchHero from "@/assets/watch-hero.jpg";
-import readHero from "@/assets/read-hero.jpg";
+import watchHero from "@/assets/watch-collage.jpg";
+import readHero from "@/assets/read-collage.jpg";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -45,7 +45,8 @@ function HomePage() {
     <div className="space-y-8">
       <div>
         <p className="text-sm text-muted-foreground">{MONTHS[m - 1]} {y}</p>
-        <h1 className="font-display text-5xl">Your journal</h1>
+        <h1 className="font-display text-5xl">Your journal<span className="text-primary">.</span></h1>
+        <p className="font-hand mt-2 text-2xl text-primary">A little collection of great stories.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <TrackCard to="/watch" theme="theme-watch" img={watchHero} icon={<Film className="h-6 w-6" />} title="Watch Track"
@@ -79,9 +80,9 @@ function TrackCard({ to, theme, img, icon, title, big, bigLabel, s }: {
 }) {
   const pct = s.monthTotal ? (s.monthDone / s.monthTotal) * 100 : 0;
   return (
-    <Link to={to} className={`${theme} group relative block overflow-hidden rounded-2xl border bg-background text-foreground shadow-card`}>
-      <img src={img} alt="" width={1600} height={704} className="h-32 w-full object-cover transition duration-700 group-hover:scale-105" />
-      <div className="space-y-3 p-5">
+    <Link to={to} className={`${theme} taped group relative block rounded-lg border bg-background text-foreground shadow-card`}>
+      <img src={img} alt="" width={1600} height={800} className="h-44 w-full rounded-t-lg object-cover" />
+      <div className="paper-surface space-y-3 p-5">
         <div className="flex items-center gap-2 text-primary">{icon}<h2 className="font-display text-3xl font-semibold text-foreground">{title}</h2></div>
         <p><span className="font-display text-5xl text-primary">{big}</span> <span className="text-sm text-muted-foreground">{bigLabel} · {s.total} in master list</span></p>
         <div className="space-y-1">

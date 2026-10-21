@@ -14,3 +14,4 @@
 - Ratings/remarks/completion date live on the monthly entry (the completion record), so re-watches keep separate reviews.
 - Metadata search runs in an authenticated server function (src/lib/search.functions.ts); uses TMDB/Google Books keys from server env if present, otherwise keyless fallbacks — keys never reach the browser.
 - App pages live under `_authenticated/`; data reads go through the browser client with owner-only RLS.
+- Journal visual themes share global semantic paper-and-ink tokens and reusable handmade utilities; route artwork uses bundled assets so private data flows remain unchanged by presentation updates.
