@@ -115,6 +115,57 @@ export type Database = {
           },
         ]
       }
+      monthly_recaps: {
+        Row: {
+          created_at: string
+          fingerprint: string
+          id: string
+          month: number
+          remark: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          fingerprint: string
+          id?: string
+          month: number
+          remark: string
+          user_id?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          month?: number
+          remark?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      recap_ai_state: {
+        Row: {
+          blocked_message: string
+          created_at: string
+          status: number
+          user_id: string
+        }
+        Insert: {
+          blocked_message: string
+          created_at?: string
+          status: number
+          user_id: string
+        }
+        Update: {
+          blocked_message?: string
+          created_at?: string
+          status?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
