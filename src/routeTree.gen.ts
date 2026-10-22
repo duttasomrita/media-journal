@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
+import { Route as AuthenticatedRecapRouteImport } from './routes/_authenticated/recap'
 import { Route as AuthenticatedReviewsRouteImport } from './routes/_authenticated/reviews'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 
@@ -41,6 +42,11 @@ const AuthenticatedReadRoute = AuthenticatedReadRouteImport.update({
   path: '/read',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRecapRoute = AuthenticatedRecapRouteImport.update({
+  id: '/recap',
+  path: '/recap',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReviewsRoute = AuthenticatedReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/home': typeof AuthenticatedHomeRoute
   '/read': typeof AuthenticatedReadRoute
+  '/recap': typeof AuthenticatedRecapRoute
   '/reviews': typeof AuthenticatedReviewsRoute
   '/watch': typeof AuthenticatedWatchRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/home': typeof AuthenticatedHomeRoute
   '/read': typeof AuthenticatedReadRoute
+  '/recap': typeof AuthenticatedRecapRoute
   '/reviews': typeof AuthenticatedReviewsRoute
   '/watch': typeof AuthenticatedWatchRoute
 }
@@ -75,14 +83,16 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
+  '/_authenticated/recap': typeof AuthenticatedRecapRoute
   '/_authenticated/reviews': typeof AuthenticatedReviewsRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/home' | '/read' | '/reviews' | '/watch'
+  fullPaths:
+    '/' | '/auth' | '/home' | '/read' | '/recap' | '/reviews' | '/watch'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/home' | '/read' | '/reviews' | '/watch'
+  to: '/' | '/auth' | '/home' | '/read' | '/recap' | '/reviews' | '/watch'
   id:
     | '__root__'
     | '/'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/home'
     | '/_authenticated/read'
+    | '/_authenticated/recap'
     | '/_authenticated/reviews'
     | '/_authenticated/watch'
   fileRoutesById: FileRoutesById
@@ -137,6 +148,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/recap': {
+      id: '/_authenticated/recap'
+      path: '/recap'
+      fullPath: '/recap'
+      preLoaderRoute: typeof AuthenticatedRecapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reviews': {
       id: '/_authenticated/reviews'
       path: '/reviews'
@@ -157,6 +175,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
+  AuthenticatedRecapRoute: typeof AuthenticatedRecapRoute
   AuthenticatedReviewsRoute: typeof AuthenticatedReviewsRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
 }
@@ -164,6 +183,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
+  AuthenticatedRecapRoute: AuthenticatedRecapRoute,
   AuthenticatedReviewsRoute: AuthenticatedReviewsRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
 }
