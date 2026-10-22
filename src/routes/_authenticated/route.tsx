@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/react-router";
-import { Film, BookOpen, Home, Star, LogOut } from "lucide-react";
+import { Film, BookOpen, Home, Star, LogOut, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/watch", label: "Watch", icon: Film },
   { to: "/read", label: "Read", icon: BookOpen },
   { to: "/reviews", label: "Reviews", icon: Star },
+  { to: "/recap", label: "Recap", icon: Sparkles },
 ] as const;
 
 function AppLayout() {
@@ -55,7 +56,7 @@ function AppLayout() {
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-background/95 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-background/95 backdrop-blur md:hidden">
         {NAV.map((n) => (
           <Link
             key={n.to}
